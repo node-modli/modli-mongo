@@ -2,6 +2,10 @@
 [![Code Climate](https://codeclimate.com/github/node-modli/modli-mongo/badges/gpa.svg)](https://codeclimate.com/github/node-modli/modli-mongo)
 [![Test Coverage](https://codeclimate.com/github/node-modli/modli-mongo/badges/coverage.svg)](https://codeclimate.com/github/node-modli/modli-mongo/coverage)
 
+# ATTENTION: In Development
+
+This repository is currently in development.
+
 # Modli - Mongo Adapter
 
 This module provides adapter for the [Mongo](https://www.mongodb.com)
