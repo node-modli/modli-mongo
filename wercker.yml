@@ -6,9 +6,13 @@ services:
 build:
   steps:
     - script:
-        name: dynamodb config
+        name: mongo config
         code: |
-          export MODLI_DYNAMODB_HOST=http://${DYNAMODB_PORT_8000_TCP_ADDR}:${DYNAMODB_PORT_8000_TCP_PORT}
+          export MODLI_MONGO_HOST=$MONGO_PORT_27017_TCP_ADDR}
+          export MODLI_MONGO_PORT=${MONGO_PORT_27017_TCP_PORT}
+          export MODLI_MONGO_USERNAME=${MONGO_ENV_MONGODB_USER}
+          export MODLI_MONGO_PASSWORD=${MONGO_ENV_MONGODB_PASS}
+          export MODLI_MONGO_DATABASE=${MONGO_ENV_MONGODB_DATABASE}
     - script:
         name: echo env
         code: |
@@ -30,7 +34,7 @@ build:
         name: build
         code: |
           make build
-          
+
   after-steps:
     # Run and report coverage
     - script:
