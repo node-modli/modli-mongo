@@ -73,14 +73,27 @@ export default class {
         .then(() => {
           // Execute
           try {
-            this.db.collection(this.collection)[command](params, (err, result) => {
-              /* istanbul ignore if */
-              if (err) {
-                reject(err);
-              } else {
-                resolve(result);
-              }
-            });
+            const coll = this.db.collection(this.collection);
+            if (command === 'find') {
+              // Find needs `toArray`
+              coll.find(params[0]).toArray((err, result) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(result);
+                }
+              });
+            } else {
+              // All other commands
+              coll[command](params, (err, result) => {
+                /* istanbul ignore if */
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(result);
+                }
+              });
+            }
           } catch (e) {
             reject(e);
           }
@@ -110,4 +123,26 @@ export default class {
       }
     });
   }
+
+  /**
+   * Reads record(s) from the collection based on query
+   * @param {Object} [query] The query to execute
+   * @param {String|Number|Boolean} [version]
+   * @returns {Object} promise
+   */
+   read (query = {}, version = false) {
+     return new Promise((resolve, reject) => {
+       this.execute('find', query)
+        .then((res) => {
+          let tmp = [];
+          res.forEach((rec) => {
+            tmp.push(this.sanitize(rec, version));
+          });
+          resolve(tmp);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+     });
+   }
 }

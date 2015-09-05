@@ -100,4 +100,28 @@ describe('mongo', () => {
       });
     });
   });
+
+  describe('read', () => {
+    it('responds with an error if query is invalid', (done) => {
+      testMongo.read({ fname: { '$in': false } }, 1)
+        .catch((err) => {
+          expect(err).to.be.object;
+          done();
+        });
+    });
+    it('returns all record if no query supplied', (done) => {
+      testMongo.read()
+        .then((res) => {
+          expect(res).to.be.an.array;
+          done();
+        });
+    });
+    it('returns the matched data on valid query', (done) => {
+      testMongo.read({ fname: 'John' })
+        .then((res) => {
+          expect(res[0].fname).to.equal('John');
+          done();
+        });
+    });
+  });
 });
