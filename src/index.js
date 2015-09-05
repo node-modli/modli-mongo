@@ -1,5 +1,8 @@
 import Promise from 'bluebird';
+import { EventEmitter } from 'events';
 import { MongoClient } from 'mongodb';
+
+const event = new EventEmitter();
 
 /**
  * @class mongo
@@ -17,6 +20,7 @@ export default class {
    */
   constructor (config) {
     let connStr;
+    this.db = false;
     if (typeof config === 'string') {
       // If full conn string is passed
       connStr = config;
@@ -29,8 +33,25 @@ export default class {
       if (err) {
         throw new Error(err);
       } else {
+        event.emit('dbInit');
         this.db = db;
         return db;
+      }
+    });
+  }
+
+  /**
+   * Ensures connection established or waits for emit
+   * @returns {Object} promise
+   */
+  checkConn () {
+    return new Promise((resolve) => {
+      if (!this.db) {
+        event.on('dbInit', () => {
+          resolve();
+        });
+      } else {
+        resolve();
       }
     });
   }
@@ -43,19 +64,22 @@ export default class {
    */
   create (body, version = false) {
     return new Promise((resolve, reject) => {
-      const validationErrors = this.validate(body, version);
-      if (validationErrors) {
-        reject(validationErrors);
-      } else {
-        this.db.collection(this.collection)
-          .insert(body, (err, res) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(res.ops);
-            }
-          });
-      }
+      this.checkConn()
+        .then(() => {
+          const validationErrors = this.validate(body, version);
+          if (validationErrors) {
+            reject(validationErrors);
+          } else {
+            this.db.collection(this.collection)
+              .insert(body, (err, res) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(res.ops);
+                }
+              });
+          }
+        });
     });
   }
 }

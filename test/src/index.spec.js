@@ -64,13 +64,6 @@ describe('mongo', () => {
         done();
       });
     });
-    it('responds with an error if the body is invalid', (done) => {
-      testMongo.create('foo=')
-        .catch((err) => {
-          expect(err).to.be.instanceof(TypeError);
-          done();
-        });
-    });
     it('creates a record if proper object passed', (done) => {
       testMongo.create(testRecord)
       .then((res) => {
