@@ -39,10 +39,6 @@ testMongo.collection = 'foo';
 
 describe('mongo', () => {
   describe('constructor', () => {
-    it('fails when an invalid config is passed', (done) => {
-      expect(() => new mongo('')).to.throw();
-      done();
-    });
     it('connects to the instance when valid config is passed', (done) => {
       expect(() => new mongo(config)).to.not.throw();
       done();
@@ -51,6 +47,30 @@ describe('mongo', () => {
       const connStr = `mongodb://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}`;
       expect(() => new mongo(connStr)).to.not.throw();
       done();
+    });
+  });
+
+  describe('execute', () => {
+    it('executes a method with args supplied', (done) => {
+      testMongo.execute('stats', null)
+        .then((res) => {
+          expect(res).to.be.an.object;
+          done();
+        });
+    });
+    it('fails if the command is executed incorrectly', (done) => {
+      testMongo.execute('insert', '/my-foot/')
+        .catch((err) => {
+          expect(err).to.be.instanceof(TypeError);
+          done();
+        });
+    });
+    it('fails if the command is not recognized', (done) => {
+      testMongo.execute('farts')
+        .catch((err) => {
+          expect(err).to.be.instanceof(TypeError);
+          done();
+        });
     });
   });
 
@@ -64,8 +84,15 @@ describe('mongo', () => {
         done();
       });
     });
+    it('responds with an error when improper data inserted', (done) => {
+      testMongo.create('test')
+        .catch((err) => {
+          expect(err).to.be.instanceof(TypeError);
+          done();
+        });
+    });
     it('creates a record if proper object passed', (done) => {
-      testMongo.create(testRecord)
+      testMongo.create(testRecord, 1)
       .then((res) => {
         expect(res[0]).to.be.an.object;
         expect(res[0].email).to.equal(testRecord.email);

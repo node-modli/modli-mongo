@@ -30,6 +30,7 @@ export default class {
     }
     // Create connection
     MongoClient.connect(connStr, (err, db) => {
+      /* istanbul ignore if */
       if (err) {
         throw new Error(err);
       } else {
@@ -48,6 +49,7 @@ export default class {
    */
   checkConn () {
     return new Promise((resolve) => {
+      /* istanbul ignore if */
       if (!this.db) {
         event.on('dbInit', () => {
           resolve();
@@ -70,13 +72,18 @@ export default class {
       this.checkConn()
         .then(() => {
           // Execute
-          this.db.collection(this.collection)[command](params, (err, res) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(res);
-            }
-          });
+          try {
+            this.db.collection(this.collection)[command](params, (err, result) => {
+              /* istanbul ignore if */
+              if (err) {
+                reject(err);
+              } else {
+                resolve(result);
+              }
+            });
+          } catch (e) {
+            reject(e);
+          }
         });
     });
   }
