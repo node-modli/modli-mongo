@@ -8,7 +8,7 @@ build:
     - script:
         name: mongo config
         code: |
-          export MODLI_MONGO_HOST=$MONGO_PORT_27017_TCP_ADDR}
+          export MODLI_MONGO_HOST=${MONGO_PORT_27017_TCP_ADDR}
           export MODLI_MONGO_PORT=${MONGO_PORT_27017_TCP_PORT}
           export MODLI_MONGO_USERNAME=${MONGO_ENV_MONGODB_USER}
           export MODLI_MONGO_PASSWORD=${MONGO_ENV_MONGODB_PASS}
