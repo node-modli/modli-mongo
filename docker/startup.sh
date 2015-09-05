@@ -15,6 +15,6 @@ while [[ RET -ne 0 ]]; do
     RET=$?
 done
 
-mongo $DATABASE --eval "db.createUser({user: '$USER', pwd: '$PASS', roles:[{role:'dbAdmin',db:'$DATABASE'}]});"
+mongo $DATABASE --eval "db.createUser({user: '$USER', pwd: '$PASS', roles:[{role:'dbAdmin',db:'$DATABASE'},{role:'readWrite',db:'$DATABASE'}]});"
 
 fg

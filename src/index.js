@@ -35,4 +35,27 @@ export default class {
     });
   }
 
+  /**
+   * Creates a new record in the collection set
+   * @param {Object} body The object to insert
+   * @param {String|Number|Boolean} [version] The model version to use
+   * @returns {Object} promise
+   */
+  create (body, version = false) {
+    return new Promise((resolve, reject) => {
+      const validationErrors = this.validate(body, version);
+      if (validationErrors) {
+        reject(validationErrors);
+      } else {
+        this.db.collection(this.collection)
+          .insert(body, (err, res) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(res.ops);
+            }
+          });
+      }
+    });
+  }
 }
