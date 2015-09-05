@@ -33,8 +33,10 @@ export default class {
       if (err) {
         throw new Error(err);
       } else {
-        event.emit('dbInit');
+        // Set instance db
         this.db = db;
+        // Emit when conn established
+        event.emit('dbInit');
         return db;
       }
     });
@@ -57,6 +59,29 @@ export default class {
   }
 
   /**
+   * Executes mongo commands after ensuring established connection
+   * @param {String} command The command to execute
+   * @param {*} ...params Spread of args to command
+   * @returns {Object} promise
+   */
+  execute (command, ...params) {
+    return new Promise((resolve, reject) => {
+      // Ensure (or wait for) connection
+      this.checkConn()
+        .then(() => {
+          // Execute
+          this.db.collection(this.collection)[command](params, (err, res) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(res);
+            }
+          });
+        });
+    });
+  }
+
+  /**
    * Creates a new record in the collection set
    * @param {Object} body The object to insert
    * @param {String|Number|Boolean} [version] The model version to use
@@ -64,22 +89,18 @@ export default class {
    */
   create (body, version = false) {
     return new Promise((resolve, reject) => {
-      this.checkConn()
-        .then(() => {
-          const validationErrors = this.validate(body, version);
-          if (validationErrors) {
-            reject(validationErrors);
-          } else {
-            this.db.collection(this.collection)
-              .insert(body, (err, res) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(res.ops);
-                }
-              });
-          }
-        });
+      const validationErrors = this.validate(body, version);
+      if (validationErrors) {
+        reject(validationErrors);
+      } else {
+        this.execute('insert', body)
+          .then((res) => {
+            resolve(res.ops);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      }
     });
   }
 }
