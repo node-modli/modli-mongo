@@ -39,12 +39,8 @@ testMongo.collection = 'foo';
 
 describe('mongo', () => {
   before((done) => {
-    testMongo.checkConn()
-      .then(() => {
-        testMongo.createCollection({})
-          .then(() => done())
-          .catch((err) => done(err));
-      })
+    testMongo.createCollection({})
+      .then(() => done())
       .catch((err) => done(err));
   });
 
@@ -79,6 +75,16 @@ describe('mongo', () => {
       testMongo.execute('farts')
         .catch((err) => {
           expect(err).to.be.instanceof(TypeError);
+          done();
+        });
+    });
+  });
+
+  describe('createCollection', () => {
+    it('creates a new collection based on the objects collection prop (name)', (done) => {
+      testMongo.createCollection()
+        .then((res) => {
+          expect(res).to.be.an.object;
           done();
         });
     });

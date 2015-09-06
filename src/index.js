@@ -89,7 +89,13 @@ export default class {
   }
 
   createCollection (options) {
-    return this.db.createCollection(this.collection, options);
+    return new Promise((resolve) => {
+      // Ensure (or wait for) connection
+      this.checkConn()
+        .then(() => {
+          resolve(this.db.createCollection(this.collection, options));
+        });
+    });
   }
 
   /**
