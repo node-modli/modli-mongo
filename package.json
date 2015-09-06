@@ -1,6 +1,6 @@
 {
   "name": "modli-mongo",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Modli adapter for Mongo",
   "main": "build/index.js",
   "repository": {
