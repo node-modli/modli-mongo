@@ -41,7 +41,7 @@ describe('mongo', () => {
   before((done) => {
     testMongo.checkConn()
       .then(() => {
-        testMongo.createCollection({capped: true, size: 10000, max: 1000, w: 1})
+        testMongo.createCollection({})
           .then(() => done())
           .catch((err) => done(err));
       })
@@ -136,11 +136,44 @@ describe('mongo', () => {
   });
 
   describe('update', () => {
-    return true;
+    it('responds with an error if query is invalid', (done) => {
+      testMongo.update({ fname: { '$in': false } }, 1)
+        .catch((err) => {
+          expect(err).to.be.an.object;
+          done();
+        });
+    });
+    it('responds with an error if validation fails', (done) => {
+      testMongo.update({ fname: 'John' }, { failValidate: true })
+        .catch((err) => {
+          expect(err.error).to.be.true;
+          done();
+        });
+    });
+    it('updates the record when valid query and body are passed', (done) => {
+      testMongo.update({ fname: 'John' }, { fname: 'Bob' })
+        .then((res) => {
+          expect(res.ok).to.equal(1);
+          done();
+        });
+    });
   });
 
   describe('delete', () => {
-    return true;
+    it('responds with an error if query is invalid', (done) => {
+      testMongo.delete({ fname: { '$in': false } })
+        .catch((err) => {
+          expect(err).to.be.an.object;
+          done();
+        });
+    });
+    it('deletes the record(s) when valid query is passed', (done) => {
+      testMongo.delete({ fname: 'John' })
+        .then((res) => {
+          expect(res.ok).to.equal(1);
+          done();
+        });
+    });
   });
 
   describe('extend', () => {

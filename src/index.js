@@ -79,7 +79,7 @@ export default class {
               resolve(coll.find(params[0]).toArray());
             } else {
               // All other commands
-              resolve(coll[command](params));
+              resolve(coll[command](...params));
             }
           } catch (e) {
             reject(e);
@@ -121,9 +121,9 @@ export default class {
    * @param {String|Number|Boolean} [version]
    * @returns {Object} promise
    */
-   read (query = {}, version = false) {
-     return new Promise((resolve, reject) => {
-       this.execute('find', query)
+  read (query = {}, version = false) {
+    return new Promise((resolve, reject) => {
+      this.execute('find', query)
         .then((res) => {
           let tmp = [];
           res.forEach((rec) => {
@@ -134,16 +134,57 @@ export default class {
         .catch((err) => {
           reject(err);
         });
-     });
-   }
+    });
+  }
 
-   /**
-   * Extends adapter by adding new method
-   * @memberof nedb
-   * @param {String} name The name of the method
-   * @param {Function} fn The method to add
+  /**
+  * Updates record(s) from the collection based on query and body
+  * @param {Object} [query] The query to execute
+  * @param {Object} body The record property(ies) to update
+  * @param {String|Number|Boolean} [version]
+  * @returns {Object} promise
+  */
+  update (query = {}, body = {}, version = false) {
+    return new Promise((resolve, reject) => {
+      const validationErrors = this.validate(body, version);
+      if (validationErrors) {
+        reject(validationErrors);
+      } else {
+        this.execute('update', query, { $set: body })
+          .then((res) => {
+            resolve(res.result);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      }
+    });
+  }
+
+  /**
+   * Deletes record(s) from the collection based on query
+   * @param {Object} query The query to execute
+   * @returns {Object} promise
    */
-    extend (name, fn) {
-      this[name] = fn.bind(this);
-    }
+  delete (query) {
+    return new Promise((resolve, reject) => {
+      this.execute('remove', query)
+        .then((res) => {
+          resolve(res.result);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  }
+
+  /**
+  * Extends adapter by adding new method
+  * @memberof nedb
+  * @param {String} name The name of the method
+  * @param {Function} fn The method to add
+  */
+  extend (name, fn) {
+    this[name] = fn.bind(this);
+  }
 }
