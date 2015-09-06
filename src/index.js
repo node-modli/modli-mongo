@@ -136,4 +136,14 @@ export default class {
         });
      });
    }
+
+   /**
+   * Extends adapter by adding new method
+   * @memberof nedb
+   * @param {String} name The name of the method
+   * @param {Function} fn The method to add
+   */
+    extend (name, fn) {
+      this[name] = fn.bind(this);
+    }
 }

@@ -134,4 +134,23 @@ describe('mongo', () => {
         });
     });
   });
+
+  describe('update', () => {
+    return true;
+  });
+
+  describe('delete', () => {
+    return true;
+  });
+
+  describe('extend', () => {
+    it('extends the object to allow for custom method', () => {
+      // Extend
+      testMongo.extend('myTestFn', () => {
+        return 'foo';
+      });
+      // Test
+      expect(testMongo.myTestFn()).to.equal('foo');
+    });
+  });
 });
