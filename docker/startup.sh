@@ -5,7 +5,7 @@ USER=${MONGODB_USER}
 PASS=${MONGODB_PASS}
 DATABASE=${MONGODB_DATABASE}
 
-mongod --httpinterface --rest --master --auth &
+mongod --httpinterface --rest --master --auth --smallfiles &
 
 RET=1
 while [[ RET -ne 0 ]]; do

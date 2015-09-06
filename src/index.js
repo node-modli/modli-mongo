@@ -76,29 +76,20 @@ export default class {
             const coll = this.db.collection(this.collection);
             if (command === 'find') {
               // Find needs `toArray`
-              coll.find(params[0]).toArray((err, result) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(result);
-                }
-              });
+              resolve(coll.find(params[0]).toArray());
             } else {
               // All other commands
-              coll[command](params, (err, result) => {
-                /* istanbul ignore if */
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(result);
-                }
-              });
+              resolve(coll[command](params));
             }
           } catch (e) {
             reject(e);
           }
         });
     });
+  }
+
+  createCollection (options) {
+    return this.db.createCollection(this.collection, options);
   }
 
   /**

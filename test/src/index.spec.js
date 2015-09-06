@@ -38,6 +38,16 @@ testMongo.sanitize = (body) => {
 testMongo.collection = 'foo';
 
 describe('mongo', () => {
+  before((done) => {
+    testMongo.checkConn()
+      .then(() => {
+        testMongo.createCollection({capped: true, size: 10000, max: 1000, w: 1})
+          .then(() => done())
+          .catch((err) => done(err));
+      })
+      .catch((err) => done(err));
+  });
+
   describe('constructor', () => {
     it('connects to the instance when valid config is passed', (done) => {
       expect(() => new mongo(config)).to.not.throw();
@@ -52,7 +62,7 @@ describe('mongo', () => {
 
   describe('execute', () => {
     it('executes a method with args supplied', (done) => {
-      testMongo.execute('stats', null)
+      testMongo.execute('stats')
         .then((res) => {
           expect(res).to.be.an.object;
           done();
