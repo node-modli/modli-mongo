@@ -2,10 +2,6 @@
 [![Code Climate](https://codeclimate.com/github/node-modli/modli-mongo/badges/gpa.svg)](https://codeclimate.com/github/node-modli/modli-mongo)
 [![Test Coverage](https://codeclimate.com/github/node-modli/modli-mongo/badges/coverage.svg)](https://codeclimate.com/github/node-modli/modli-mongo/coverage)
 
-> # ATTENTION: In Development
-
-> This repository is currently in development.
-
 # Modli - Mongo Adapter
 
 This module provides adapter for the [Mongo](https://www.mongodb.com)
@@ -17,32 +13,148 @@ datasource for integration with [Modli](https://github.com/node-modli).
 npm install modli-mongo --save
 ```
 
-## Usage
+## Config and Usage
+
+When defining a property which will utilize the adapter it is required that a
+`collection` be supplied:
 
 ```javascript
 import { model, adapter, Joi, use } from 'modli';
-import { mongo } from 'modli-mongo';
+import mongo from 'modli-mongo';
 
-// Create a model
 model.add({
-  name: 'testModel',
+  name: 'foo',
   version: 1,
+  collection: 'tblFoo'
   schema: {
-    /* ...schema properties... */
+    id: Joi.number().integer(),
+    fname: Joi.string().min(3).max(30),
+    lname: Joi.string().min(3).max(30),
+    email: Joi.string().email().min(3).max(254).required()
   }
 });
+```
 
-// Add adapter using NeDB
-model.add({
-  name: 'testMongo',
+Then add the adapter as per usual with the following config object structure:
+
+```javascript
+adapter.add({
+  name: 'mongoFoo',
   source: mongo
   config: {
-    /*...*/
+    host: {HOST_IP},
+    port: {HOST_PORT},
+    username: {USERNAME},
+    password: {PASSWORD},
+    database: {DATABASE}
   }
 });
-
-const testModli = use('testModel', 'testMongo');
 ```
+
+You can then use the adapter with a model via:
+
+```javascript
+// Use(MODEL, ADAPTER)
+const mongoTest = use('foo', 'mongoFoo');
+```
+
+## Methods
+
+The following methods exist natively on the Mongo adapter:
+
+### `execute`
+
+Allows for executing methods directly on the collection:
+
+```javascript
+mongoTest.execute('insert', { /*...record...*/ })
+  .then(/*...*/)
+  .catch(/*...*/);
+```
+
+### `createCollection`
+
+Creates the collection based on the model's `collection` name:
+
+```javascript
+mongoTest.createCollection()
+  .then(/*...*/)
+  .catch(/*...*/);
+```
+
+### `create`
+
+Creates a new record based on object passed:
+
+```javascript
+mongoTest.create({
+    fname: 'John',
+    lname: 'Smith',
+    email: 'jsmith@gmail.com'
+  })
+  .then(/*...*/)
+  .catch(/*...*/);
+```
+
+### `read`
+
+Returns records matching a query object (or all if no query specified):
+
+```javascript
+mongoTest.read({ fname: 'John' })
+  .then(/*...*/)
+  .catch(/*...*/);
+```
+
+### `update`
+
+Updates record(s) based on query and body:
+
+```javascript
+mongoTest.update({ fname: 'John' }, {
+    fname: 'Bob',
+    email: 'bsmith@gmail.com'
+  })
+  .then(/*...*/)
+  .catch(/*...*/);
+```
+
+### `delete`
+
+Deletes record(s) based on query:
+
+```javascript
+mongoTest.delete({ fname: 'John' })
+  .then(/*...*/)
+  .catch(/*...*/);
+```
+
+### `extend`
+
+Extends the adapter to allow for custom methods:
+
+```javascript
+mongoTest.extend('myMethod', () => {
+  /*...*/
+});
+```
+
+## Development
+
+The Mongo adapter requires the following enviroment variables to be set for
+running the tests. These should be associated with the Mongo instance running
+locally.
+
+```
+MODLI_MONGO_HOST,
+MODLI_MONGO_PORT,
+MODLI_MONGO_USERNAME,
+MODLI_MONGO_PASSWORD,
+MODLI_MONGO_DATABASE
+```
+
+This repository includes a base container config for running locally which is
+located in the [/docker](/docker) directory.
 
 ## Makefile and Scripts
 
