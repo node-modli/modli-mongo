@@ -25,7 +25,7 @@ import mongo from 'modli-mongo';
 model.add({
   name: 'foo',
   version: 1,
-  collection: 'tblFoo'
+  collection: 'fooCollection'
   schema: {
     id: Joi.number().integer(),
     fname: Joi.string().min(3).max(30),
@@ -71,6 +71,19 @@ mongoTest.execute('insert', { /*...record...*/ })
   .then(/*...*/)
   .catch(/*...*/);
 ```
+
+### `checkConn`
+
+Ensures (or waits for) established connection:
+
+```javascript
+mongoTest.checkConn()
+  .then(/*...*/);
+```
+
+*Note: the `checkConn` method is already utilized by all other methods
+and only needs to be added in a case where you're extending
+on or using a method of the `db` object directly.*
 
 ### `createCollection`
 
