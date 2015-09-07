@@ -154,7 +154,7 @@ mongoTest.extend('myMethod', () => {
 
 ## Development
 
-The Mongo adapter requires the following enviroment variables to be set for
+The Mongo adapter requires the following environment variables to be set for
 running the tests. These should be associated with the Mongo instance running
 locally.
 
